@@ -3,12 +3,12 @@ the repo (mr-immersive-telemanipulation folder) closer to the root directory.
 
 Before (not working version):
 ```
-C:\Users\duzce\Desktop\ETH\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation
+C:\Users\duzce\Desktop\ETH\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation\\Assets\MixedRealityToolkit.Examples\Demos\Utilities\InspectorFields\Inspectors
 ```
 
 Now (working version):
 ```
-C:\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation
+C:\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation\\Assets\MixedRealityToolkit.Examples\Demos\Utilities\InspectorFields\Inspectors
 ```
 
 Here's is the full, more official description plus solution
