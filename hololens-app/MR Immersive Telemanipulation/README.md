@@ -2,10 +2,14 @@ There is an awkward issue with one MRTK asset. Simply, if the final directory na
 the repo (mr-immersive-telemanipulation folder) closer to the root directory. 
 
 Before (not working version):
+```
 C:\Users\duzce\Desktop\ETH\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation
+```
 
 Now (working version):
+```
 C:\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive Telemanipulation
+```
 
 Here's is the full, more official description plus solution
 of the issue: https://github.com/microsoft/MixedReality-SpectatorView/tree/master/samples#issue-directorynotfoundexception-during-build
