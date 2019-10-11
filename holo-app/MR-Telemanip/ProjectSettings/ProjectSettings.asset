@@ -550,8 +550,7 @@ PlayerSettings:
   m_MobileRenderingPath: 1
   metroPackageName: MRImmersiveTelemanipulation
   metroPackageVersion: 1.0.0.0
-  metroCertificatePath: C:\MR Lab\mr-immersive-telemanipulation\hololens-app\MR Immersive
-    Telemanipulation\Assets\WSATestCertificate.pfx
+  metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: MR Immersive Telemanipulation
   metroCertificateIssuer: MR Immersive Telemanipulation
