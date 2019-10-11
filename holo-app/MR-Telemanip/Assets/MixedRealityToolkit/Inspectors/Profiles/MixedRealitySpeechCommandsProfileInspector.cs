@@ -62,12 +62,7 @@ namespace Microsoft.MixedReality.Toolkit.Editor
         {
             RenderProfileHeader(ProfileTitle, ProfileDescription, target, isInitialized, BackProfileType.Input);
 
-            RenderMixedRealityInputConfigured();
-
-            if (MixedRealityToolkit.IsInitialized && MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.InputActionsProfile == null)
-            {
-                EditorGUILayout.HelpBox("No input actions found, please specify a input action profile in the main configuration.", MessageType.Error);
-            }
+            CheckMixedRealityInputActions();
 
             using (new GUIEnabledWrapper(!IsProfileLock((BaseMixedRealityProfile)target)))
             {
@@ -97,6 +92,7 @@ namespace Microsoft.MixedReality.Toolkit.Editor
         {
             var profile = target as BaseMixedRealityProfile;
             return MixedRealityToolkit.IsInitialized && profile != null &&
+                   MixedRealityToolkit.Instance.HasActiveProfile &&
                    MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile != null &&
                    profile == MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.SpeechCommandsProfile;
         }
@@ -107,9 +103,9 @@ namespace Microsoft.MixedReality.Toolkit.Editor
             using (new GUIEnabledWrapper(isInitialized, false))
             {
                 EditorGUILayout.Space();
-                GUILayout.BeginVertical();
-
-                    if (MixedRealityEditorUtility.RenderIndentedButton(AddButtonContent, EditorStyles.miniButton))
+                using (new EditorGUILayout.VerticalScope())
+                {
+                    if (InspectorUIUtility.RenderIndentedButton(AddButtonContent, EditorStyles.miniButton))
                     {
                         list.arraySize += 1;
                         var speechCommand = list.GetArrayElementAtIndex(list.arraySize - 1);
@@ -124,66 +120,55 @@ namespace Microsoft.MixedReality.Toolkit.Editor
                         actionId.intValue = 0;
                     }
 
-                    GUILayout.Space(12f);
+                    EditorGUILayout.Space();
 
-                if (list == null || list.arraySize == 0)
-                {
-                    EditorGUILayout.HelpBox("Create a new Speech Command.", MessageType.Warning);
-                    GUILayout.EndVertical();
-                    return;
-                }
+                    if (list == null || list.arraySize == 0)
+                    {
+                        EditorGUILayout.HelpBox("Create a new Speech Command.", MessageType.Warning);
+                        return;
+                    }
 
-                    GUILayout.BeginVertical();
-
-                        GUILayout.BeginHorizontal();
-                            var labelWidth = EditorGUIUtility.labelWidth;
-                            EditorGUIUtility.labelWidth = 36f;
-                            EditorGUILayout.LabelField(LocalizationContent, GUILayout.ExpandWidth(true));
-                            EditorGUILayout.LabelField(KeywordContent, GUILayout.ExpandWidth(true));
-                            EditorGUILayout.LabelField(KeyCodeContent, GUILayout.Width(64f));
-                            EditorGUILayout.LabelField(ActionContent, GUILayout.Width(64f));
-                            EditorGUILayout.LabelField(string.Empty, GUILayout.Width(24f));
-                            EditorGUIUtility.labelWidth = labelWidth;
-                        GUILayout.EndHorizontal();
-
-                        for (int i = 0; i < list.arraySize; i++)
+                    for (int i = 0; i < list.arraySize; i++)
+                    {
+                        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                         {
-                            EditorGUILayout.BeginHorizontal();
-                                SerializedProperty speechCommand = list.GetArrayElementAtIndex(i);
-                                var localizationKey = speechCommand.FindPropertyRelative("localizationKey");
-                                EditorGUILayout.PropertyField(localizationKey, GUIContent.none, GUILayout.ExpandWidth(true));
+                            SerializedProperty speechCommand = list.GetArrayElementAtIndex(i);
 
+                            using (new EditorGUILayout.HorizontalScope())
+                            {
                                 var keyword = speechCommand.FindPropertyRelative("keyword");
-                                EditorGUILayout.PropertyField(keyword, GUIContent.none, GUILayout.ExpandWidth(true));
-
-                                var keyCode = speechCommand.FindPropertyRelative("keyCode");
-                                EditorGUILayout.PropertyField(keyCode, GUIContent.none, GUILayout.Width(64f));
-
-                                var action = speechCommand.FindPropertyRelative("action");
-                                var actionId = action.FindPropertyRelative("id");
-                                var actionDescription = action.FindPropertyRelative("description");
-                                var actionConstraint = action.FindPropertyRelative("axisConstraint");
-
-                                EditorGUI.BeginChangeCheck();
-                                actionId.intValue = EditorGUILayout.IntPopup(GUIContent.none, actionId.intValue, actionLabels, actionIds, GUILayout.Width(64f));
-
-                                if (EditorGUI.EndChangeCheck())
-                                {
-                                    MixedRealityInputAction inputAction = actionId.intValue == 0 ? MixedRealityInputAction.None : MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.InputActionsProfile.InputActions[actionId.intValue - 1];
-                                    actionDescription.stringValue = inputAction.Description;
-                                    actionConstraint.enumValueIndex = (int)inputAction.AxisConstraint;
-                                }
-
+                                EditorGUILayout.PropertyField(keyword, KeywordContent);
                                 if (GUILayout.Button(MinusButtonContent, EditorStyles.miniButtonRight, GUILayout.Width(24f)))
                                 {
                                     list.DeleteArrayElementAtIndex(i);
+                                    break;
                                 }
+                            }
 
-                            EditorGUILayout.EndHorizontal();
+                            var localizationKey = speechCommand.FindPropertyRelative("localizationKey");
+                            EditorGUILayout.PropertyField(localizationKey, LocalizationContent);
+
+                            var keyCode = speechCommand.FindPropertyRelative("keyCode");
+                            EditorGUILayout.PropertyField(keyCode, KeyCodeContent);
+
+                            var action = speechCommand.FindPropertyRelative("action");
+                            var actionId = action.FindPropertyRelative("id");
+                            var actionDescription = action.FindPropertyRelative("description");
+                            var actionConstraint = action.FindPropertyRelative("axisConstraint");
+
+                            EditorGUI.BeginChangeCheck();
+                            actionId.intValue = EditorGUILayout.IntPopup(ActionContent, actionId.intValue, actionLabels, actionIds);
+
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                MixedRealityInputAction inputAction = actionId.intValue == 0 ? MixedRealityInputAction.None : MixedRealityToolkit.Instance.ActiveProfile.InputSystemProfile.InputActionsProfile.InputActions[actionId.intValue - 1];
+                                actionDescription.stringValue = inputAction.Description;
+                                actionConstraint.enumValueIndex = (int)inputAction.AxisConstraint;
+                            }
                         }
-
-                    GUILayout.EndVertical();
-                GUILayout.EndVertical();
+                        EditorGUILayout.Space();
+                    }
+                }
             }
         }
     }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Input;
+using TMPro;
 using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.Examples
@@ -11,11 +12,13 @@ namespace Microsoft.MixedReality.Toolkit.Examples
         public GameObject HoldIndicator = null;
         public GameObject ManipulationIndicator = null;
         public GameObject NavigationIndicator = null;
+        public GameObject SelectIndicator = null;
 
         public Material DefaultMaterial = null;
         public Material HoldMaterial = null;
         public Material ManipulationMaterial = null;
         public Material NavigationMaterial = null;
+        public Material SelectMaterial = null;
 
         public GameObject RailsAxisX = null;
         public GameObject RailsAxisY = null;
@@ -57,6 +60,8 @@ namespace Microsoft.MixedReality.Toolkit.Examples
                 SetIndicator(NavigationIndicator, $"Navigation: started {Vector3.zero}", NavigationMaterial, Vector3.zero);
                 ShowRails(Vector3.zero);
             }
+            
+            SetIndicator(SelectIndicator, "Select:", DefaultMaterial);
         }
 
         public void OnGestureUpdated(InputEventData eventData)
@@ -70,21 +75,21 @@ namespace Microsoft.MixedReality.Toolkit.Examples
             }
         }
 
-    public void OnGestureUpdated(InputEventData<Vector3> eventData)
-    {
-        Debug.Log($"OnGestureUpdated [{Time.frameCount}]: {eventData.MixedRealityInputAction.Description}");
+        public void OnGestureUpdated(InputEventData<Vector3> eventData)
+        {
+            Debug.Log($"OnGestureUpdated [{Time.frameCount}]: {eventData.MixedRealityInputAction.Description}");
 
-        var action = eventData.MixedRealityInputAction.Description;
-        if (action == "Manipulate Action")
-        {
-            SetIndicator(ManipulationIndicator, $"Manipulation: updated {eventData.InputData}", ManipulationMaterial, eventData.InputData);
+            var action = eventData.MixedRealityInputAction.Description;
+            if (action == "Manipulate Action")
+            {
+                SetIndicator(ManipulationIndicator, $"Manipulation: updated {eventData.InputData}", ManipulationMaterial, eventData.InputData);
+            }
+            else if (action == "Navigation Action")
+            {
+                SetIndicator(NavigationIndicator, $"Navigation: updated {eventData.InputData}", NavigationMaterial, eventData.InputData);
+                ShowRails(eventData.InputData);
+            }
         }
-        else if (action == "Navigation Action")
-        {
-            SetIndicator(NavigationIndicator, $"Navigation: updated {eventData.InputData}", NavigationMaterial, eventData.InputData);
-            ShowRails(eventData.InputData);
-        }
-    }
 
         public void OnGestureCompleted(InputEventData eventData)
         {
@@ -95,23 +100,27 @@ namespace Microsoft.MixedReality.Toolkit.Examples
             {
                 SetIndicator(HoldIndicator, "Hold: completed", DefaultMaterial);
             }
+            else if (action == "Select")
+            {
+                SetIndicator(SelectIndicator, "Select: completed", SelectMaterial);
+            }
         }
 
-    public void OnGestureCompleted(InputEventData<Vector3> eventData)
-    {
-        Debug.Log($"OnGestureCompleted [{Time.frameCount}]: {eventData.MixedRealityInputAction.Description}");
+        public void OnGestureCompleted(InputEventData<Vector3> eventData)
+        {
+            Debug.Log($"OnGestureCompleted [{Time.frameCount}]: {eventData.MixedRealityInputAction.Description}");
 
-        var action = eventData.MixedRealityInputAction.Description;
-        if (action == "Manipulate Action")
-        {
-            SetIndicator(ManipulationIndicator, $"Manipulation: completed {eventData.InputData}", DefaultMaterial, eventData.InputData);
+            var action = eventData.MixedRealityInputAction.Description;
+            if (action == "Manipulate Action")
+            {
+                SetIndicator(ManipulationIndicator, $"Manipulation: completed {eventData.InputData}", DefaultMaterial, eventData.InputData);
+            }
+            else if (action == "Navigation Action")
+            {
+                SetIndicator(NavigationIndicator, $"Navigation: completed {eventData.InputData}", DefaultMaterial, eventData.InputData);
+                HideRails();
+            }
         }
-        else if (action == "Navigation Action")
-        {
-            SetIndicator(NavigationIndicator, $"Navigation: completed {eventData.InputData}", DefaultMaterial, eventData.InputData);
-            HideRails();
-        }
-    }
 
         public void OnGestureCanceled(InputEventData eventData)
         {
@@ -142,7 +151,7 @@ namespace Microsoft.MixedReality.Toolkit.Examples
                 {
                     renderer.material = material;
                 }
-                var text = indicator.GetComponentInChildren<TextMesh>();
+                var text = indicator.GetComponentInChildren<TextMeshPro>();
                 if (text)
                 {
                     text.text = label;

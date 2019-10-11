@@ -31,6 +31,22 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// </summary>
         public InputActionUnityEvent OnInputActionEnded;
 
+        #region InputSystemGlobalHandlerListener Implementation
+
+        /// <inheritdoc />
+        protected override void RegisterHandlers()
+        {
+            InputSystem?.RegisterHandler<IMixedRealityInputActionHandler>(this);
+        }
+
+        /// <inheritdoc />
+        protected override void UnregisterHandlers()
+        {
+            InputSystem?.UnregisterHandler<IMixedRealityInputActionHandler>(this);
+        }
+
+        #endregion InputSystemGlobalHandlerListener Implementation
+
         void IMixedRealityInputActionHandler.OnActionStarted(BaseInputEventData eventData)
         {
             if (eventData.MixedRealityInputAction == InputAction && !eventData.used)

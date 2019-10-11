@@ -28,22 +28,12 @@ namespace Microsoft.MixedReality.Toolkit.WindowsMixedReality.Input
         new[] { Handedness.Left, Handedness.Right })]
     public class WindowsMixedRealityArticulatedHand : BaseWindowsMixedRealitySource, IMixedRealityHand
     {
-    /// <summary>
+        /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="trackingState"></param>
-        /// <param name="controllerHandedness"></param>
-        /// <param name="inputSource"></param>
-        /// <param name="interactions"></param>
         public WindowsMixedRealityArticulatedHand(TrackingState trackingState, Handedness controllerHandedness, IMixedRealityInputSource inputSource = null, MixedRealityInteractionMapping[] interactions = null)
                 : base(trackingState, controllerHandedness, inputSource, interactions)
         {
-#if WINDOWS_UWP
-            UnityEngine.WSA.Application.InvokeOnUIThread(() =>
-            {
-                spatialInteractionManager = SpatialInteractionManager.GetForCurrentView();
-            }, true);
-#endif // WINDOWS_UWP
         }
 
         /// <summary>
@@ -107,6 +97,22 @@ namespace Microsoft.MixedReality.Toolkit.WindowsMixedReality.Input
         private readonly HandRay handRay = new HandRay();
 
 #if WINDOWS_UWP
+        private SpatialInteractionManager SpatialInteractionManager
+        {
+            get
+            {
+                if (spatialInteractionManager == null)
+                {
+                    UnityEngine.WSA.Application.InvokeOnUIThread(() =>
+                    {
+                        spatialInteractionManager = SpatialInteractionManager.GetForCurrentView();
+                    }, true);
+                }
+
+                return spatialInteractionManager;
+            }
+        }
+
         private SpatialInteractionManager spatialInteractionManager = null;
         private HandMeshObserver handMeshObserver = null;
         private int[] handMeshTriangleIndices = null;
@@ -206,7 +212,7 @@ namespace Microsoft.MixedReality.Toolkit.WindowsMixedReality.Input
             }
 
             PerceptionTimestamp perceptionTimestamp = PerceptionTimestampHelper.FromHistoricalTargetTime(DateTimeOffset.Now);
-            IReadOnlyList<SpatialInteractionSourceState> sources = spatialInteractionManager?.GetDetectedSourcesAtTimestamp(perceptionTimestamp);
+            IReadOnlyList<SpatialInteractionSourceState> sources = SpatialInteractionManager?.GetDetectedSourcesAtTimestamp(perceptionTimestamp);
             foreach (SpatialInteractionSourceState sourceState in sources)
             {
                 if (sourceState.Source.Id.Equals(interactionSourceState.source.id))
@@ -430,42 +436,6 @@ namespace Microsoft.MixedReality.Toolkit.WindowsMixedReality.Input
 
         #region Protected InputSource Helpers
 
-        // Velocity internal states
-        private float deltaTimeStart;
-        private Vector3 lastPosition;
-        private Vector3 lastPalmNormal;
-        private readonly int velocityUpdateInterval = 9;
-        private int frameOn = 0;
-
-        #region Gesture Definitions
-
-        protected void UpdateVelocity()
-        {
-            if (frameOn == 0)
-            {
-                deltaTimeStart = Time.unscaledTime;
-
-                lastPosition = unityJointPositions[(int)HandJointKind.Palm];
-                lastPalmNormal = unityJointOrientations[(int)HandJointKind.Palm] * Vector3.up;
-            }
-            else if (frameOn == velocityUpdateInterval)
-            {
-                //update linear velocity
-                float deltaTime = Time.unscaledTime - deltaTimeStart;
-                Vector3 newVelocity = (unityJointPositions[(int)HandJointKind.Palm] - lastPosition) / deltaTime;
-                Velocity = (Velocity * 0.8f) + (newVelocity * 0.2f);
-
-                //update angular velocity
-                Vector3 currentPalmNormal = unityJointOrientations[(int)HandJointKind.Palm] * Vector3.up;
-                Quaternion rotation = Quaternion.FromToRotation(lastPalmNormal, currentPalmNormal);
-                Vector3 rotationRate = rotation.eulerAngles * Mathf.Deg2Rad;
-                AngularVelocity = rotationRate / deltaTime;
-            }
-
-            frameOn++;
-            frameOn = frameOn > velocityUpdateInterval ? 0 : frameOn;
-        }
-
         protected void UpdateCurrentIndexPose()
         {
             currentIndexPose.Rotation = unityJointOrientations[(int)HandJointKind.IndexTip];
@@ -473,8 +443,6 @@ namespace Microsoft.MixedReality.Toolkit.WindowsMixedReality.Input
             var skinOffsetFromBone = (currentIndexPose.Rotation * Vector3.forward * lastIndexTipRadius);
             currentIndexPose.Position = (unityJointPositions[(int)HandJointKind.IndexTip] + skinOffsetFromBone);
         }
-
-        #endregion Gesture Definitions
 
         #endregion Private InputSource Helpers
 

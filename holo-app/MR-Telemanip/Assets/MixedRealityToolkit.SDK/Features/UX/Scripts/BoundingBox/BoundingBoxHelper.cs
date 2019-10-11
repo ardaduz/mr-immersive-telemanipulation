@@ -24,6 +24,8 @@ namespace Microsoft.MixedReality.Toolkit.UI
         readonly int[] noFaceIndices = { };
         readonly Vector3[] noFaceVertices = { };
 
+        private Vector3[] face = new Vector3[4];
+        private Vector3[] midpoints = new Vector3[4];
         private List<Vector3> rawBoundingCorners = new List<Vector3>();
         private List<Vector3> worldBoundingCorners = new List<Vector3>();
         private BoxCollider targetBounds;
@@ -33,9 +35,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// Objects that align to an target's bounding box can call this function in the object's UpdateLoop
         /// to get current bound points;
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="boundsPoints"></param>
-        /// <param name="ignoreLayers"></param>
         public void UpdateNonAABoundingBoxCornerPositions(BoundingBox boundingBox, List<Vector3> boundsPoints)
         {
             if (boundingBox.TargetBounds != targetBounds || rawBoundingCornersObtained == false)
@@ -59,8 +58,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// <summary>
         /// This function gets the untransformed bounding box corner points of a GameObject.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="ignoreLayers"></param>
         public void GetRawBBCorners(BoundingBox boundingBox)
         {
             targetBounds = boundingBox.TargetBounds;
@@ -109,7 +106,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         public Vector3[] GetFaceEdgeMidpoints(int index)
         {
             Vector3[] corners = GetFaceCorners(index);
-            Vector3[] midpoints = new Vector3[4];
             midpoints[0] = (corners[0] + corners[1]) * 0.5f;
             midpoints[1] = (corners[1] + corners[2]) * 0.5f;
             midpoints[2] = (corners[2] + corners[3]) * 0.5f;
@@ -142,7 +138,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// by the index parameter;
         /// </summary>
         /// <param name="index">an index into the list of faces of a boundingcube. 0-5</param>
-        /// <returns></returns>
         public Vector3 GetFaceCentroid(int index)
         {
             int[] faceIndices = GetFaceIndices(index);
@@ -186,7 +181,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
 
             if (faceIndices.Length == 4)
             {
-                Vector3[] face = new Vector3[4];
                 face[0] = worldBoundingCorners[faceIndices[0]];
                 face[1] = worldBoundingCorners[faceIndices[1]];
                 face[2] = worldBoundingCorners[faceIndices[2]];
@@ -226,7 +220,6 @@ namespace Microsoft.MixedReality.Toolkit.UI
         /// </summary>
         /// <param name="target">The gameObject whose bounding box is desired</param>
         /// <param name="boundsPoints">the array of 8 points that will be filled</param>
-        /// <param name="ignoreLayers">a LayerMask variable</param>
         public static void GetUntransformedCornersFromObject(BoxCollider targetBounds, List<Vector3> boundsPoints)
         {
             Bounds cloneBounds = new Bounds(targetBounds.center, targetBounds.size);

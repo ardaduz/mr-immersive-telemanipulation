@@ -17,8 +17,30 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
     /// </summary>
     public static class MixedRealityInspectorUtility
     {
+        #region Colors
+
+        public static readonly Color DisabledColor = new Color(0.6f, 0.6f, 0.6f);
+        public static readonly Color WarningColor = new Color(1f, 0.85f, 0.6f);
+        public static readonly Color ErrorColor = new Color(1f, 0.55f, 0.5f);
+        public static readonly Color SuccessColor = new Color(0.8f, 1f, 0.75f);
+        public static readonly Color SectionColor = new Color(0.85f, 0.9f, 1f);
+        public static readonly Color DarkColor = new Color(0.1f, 0.1f, 0.1f);
+        public static readonly Color HandleColorSquare = new Color(0.0f, 0.9f, 1f);
+        public static readonly Color HandleColorCircle = new Color(1f, 0.5f, 1f);
+        public static readonly Color HandleColorSphere = new Color(1f, 0.5f, 1f);
+        public static readonly Color HandleColorAxis = new Color(0.0f, 1f, 0.2f);
+        public static readonly Color HandleColorRotation = new Color(0.0f, 1f, 0.2f);
+        public static readonly Color HandleColorTangent = new Color(0.1f, 0.8f, 0.5f, 0.7f);
+        public static readonly Color LineVelocityColor = new Color(0.9f, 1f, 0f, 0.8f);
+
+        #endregion Colors
+
         public const float DottedLineScreenSpace = 4.65f;
         public const string DefaultConfigProfileName = "DefaultMixedRealityToolkitConfigurationProfile";
+
+        public static readonly Texture2D LogoLightTheme = (Texture2D)AssetDatabase.LoadAssetAtPath(MixedRealityToolkitFiles.MapRelativeFilePath("StandardAssets/Textures/MRTK_Logo_Black.png"), typeof(Texture2D));
+
+        public static readonly Texture2D LogoDarkTheme = (Texture2D)AssetDatabase.LoadAssetAtPath(MixedRealityToolkitFiles.MapRelativeFilePath("StandardAssets/Textures/MRTK_Logo_White.png"), typeof(Texture2D));
 
         /// <summary>
         /// Check and make sure we have a Mixed Reality Toolkit and an active profile.
@@ -59,6 +81,19 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
                     newInstance.ActiveProfile = configProfile;
                 }
             }
+        }
+
+        /// <summary>
+        /// Render the Mixed Reality Toolkit Logo.
+        /// </summary>
+        public static void RenderMixedRealityToolkitLogo()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label(EditorGUIUtility.isProSkin ? LogoDarkTheme : LogoLightTheme, GUILayout.MaxHeight(96f));
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
         }
 
         /// <summary>
@@ -104,7 +139,7 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
 
             foreach (var assembly in assemblies)
             {
-                var types = assembly.GetTypes();
+                var types = assembly.GetLoadableTypes();
                 result.AddRange(types.Where(type => type.IsSubclassOf(aType)));
             }
 
@@ -114,7 +149,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
         /// <summary>
         /// Centers an editor window on the main display.
         /// </summary>
-        /// <param name="window"></param>
         public static void CenterOnMainWin(this EditorWindow window)
         {
             var main = GetEditorMainWindowPos();
@@ -125,24 +159,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
             pos.y = main.y + h;
             window.position = pos;
         }
-
-        #region Colors
-
-        public static readonly Color DisabledColor = new Color(0.6f, 0.6f, 0.6f);
-        public static readonly Color WarningColor = new Color(1f, 0.85f, 0.6f);
-        public static readonly Color ErrorColor = new Color(1f, 0.55f, 0.5f);
-        public static readonly Color SuccessColor = new Color(0.8f, 1f, 0.75f);
-        public static readonly Color SectionColor = new Color(0.85f, 0.9f, 1f);
-        public static readonly Color DarkColor = new Color(0.1f, 0.1f, 0.1f);
-        public static readonly Color HandleColorSquare = new Color(0.0f, 0.9f, 1f);
-        public static readonly Color HandleColorCircle = new Color(1f, 0.5f, 1f);
-        public static readonly Color HandleColorSphere = new Color(1f, 0.5f, 1f);
-        public static readonly Color HandleColorAxis = new Color(0.0f, 1f, 0.2f);
-        public static readonly Color HandleColorRotation = new Color(0.0f, 1f, 0.2f);
-        public static readonly Color HandleColorTangent = new Color(0.1f, 0.8f, 0.5f, 0.7f);
-        public static readonly Color LineVelocityColor = new Color(0.9f, 1f, 0f, 0.8f);
-
-        #endregion Colors
 
         #region Handles
 
@@ -189,7 +205,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
         /// <summary>
         /// Returns the default config profile, if it exists.
         /// </summary>
-        /// <returns></returns>
         public static MixedRealityToolkitConfigurationProfile GetDefaultConfigProfile()
         {
             var allConfigProfiles = ScriptableObjectExtensions.GetAllInstances<MixedRealityToolkitConfigurationProfile>();
@@ -323,8 +338,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities.Editor
         /// Draw a vector handle.
         /// </summary>
         /// <param name="target"><see href="https://docs.unity3d.com/ScriptReference/Object.html">Object</see> that is undergoing the transformation. Also used for recording undo.</param>
-        /// <param name="origin"></param>
-        /// <param name="vector"></param>
         /// <param name="normalize">Optional, Normalize the new vector value.</param>
         /// <param name="clamp">Optional, Clamp new vector's value based on the distance to the origin.</param>
         /// <param name="handleLength">Optional, handle length.</param>

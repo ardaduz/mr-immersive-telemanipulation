@@ -22,7 +22,12 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
             {
                 if (cachedCamera != null)
                 {
-                    return cachedCamera;
+                    if (cachedCamera.gameObject.activeInHierarchy)
+                    {   // If the cached camera is active, return it
+                        // Otherwise, our playspace may have been disabled
+                        // We'll have to search for the next available
+                        return cachedCamera;
+                    }
                 }
 
                 // If the cached camera is null, search for main
@@ -31,7 +36,7 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
                 if (mainCamera == null)
                 {   // If no main camera was found, create it now
                     Debug.LogWarning("No main camera found. The Mixed Reality Toolkit requires at least one camera in the scene. One will be generated now.");
-                    mainCamera = new GameObject("Main Camera", typeof(Camera)) { tag = "MainCamera" }.GetComponent<Camera>();
+                    mainCamera = new GameObject("Main Camera", typeof(Camera), typeof(AudioListener)) { tag = "MainCamera" }.GetComponent<Camera>();
                 }
 
                 // Cache the main camera

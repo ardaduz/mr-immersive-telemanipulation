@@ -9,7 +9,7 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
     /// A basic grid layout for game objects of a consistent size
     /// </summary>
     /// 
-    [ExecuteInEditMode]
+    [ExecuteAlways]
     public class TileGridObjectCollection : MonoBehaviour
     {
         /// <summary>
@@ -108,8 +108,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
         /// <summary>
         /// Set the item position by index
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
         public virtual Vector3 GetListPosition(int index)
         {
             int column = index % Columns;

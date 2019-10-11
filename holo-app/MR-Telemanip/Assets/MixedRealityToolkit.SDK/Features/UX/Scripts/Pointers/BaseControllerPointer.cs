@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.MixedReality.Toolkit.Physics;
-using Microsoft.MixedReality.Toolkit.Utilities;
 using System.Collections;
 using UnityEngine;
 
@@ -12,6 +11,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
     /// Base Pointer class for pointers that exist in the scene as GameObjects.
     /// </summary>
     [DisallowMultipleComponent]
+    [HelpURL("https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/Input/Pointers.html")]
     public abstract class BaseControllerPointer : ControllerPoseSynchronizer, IMixedRealityPointer
     {
         [SerializeField]
@@ -59,6 +59,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
 
         protected bool IsHoldPressed = false;
 
+        private bool isCursorInstantiatedFromPrefab = false;
+
         /// <summary>
         /// Set a new cursor for this <see cref="Microsoft.MixedReality.Toolkit.Input.IMixedRealityPointer"/>
         /// </summary>
@@ -68,27 +70,33 @@ namespace Microsoft.MixedReality.Toolkit.Input
         {
             if (cursorInstance != null)
             {
-                if (Application.isEditor)
-                {
-                    DestroyImmediate(cursorInstance);
-                }
-                else
-                {
-                    Destroy(cursorInstance);
-                }
-
+                DestroyCursorInstance();
                 cursorInstance = newCursor;
             }
 
             if (cursorInstance == null && cursorPrefab != null)
             {
                 cursorInstance = Instantiate(cursorPrefab, transform);
+                isCursorInstantiatedFromPrefab = true;
             }
 
             if (cursorInstance != null)
             {
                 cursorInstance.name = $"{Handedness}_{name}_Cursor";
+
+                BaseCursor oldC = BaseCursor as BaseCursor;
+                if (oldC != null && enabled)
+                {
+                    oldC.VisibleSourcesCount--;
+                }
+
                 BaseCursor = cursorInstance.GetComponent<IMixedRealityCursor>();
+
+                BaseCursor newC = BaseCursor as BaseCursor;
+                if (newC != null && enabled)
+                {
+                    newC.VisibleSourcesCount++;
+                }
 
                 if (BaseCursor != null)
                 {
@@ -108,6 +116,15 @@ namespace Microsoft.MixedReality.Toolkit.Input
             }
         }
 
+        private void DestroyCursorInstance()
+        {
+            if (cursorInstance != null)
+            {
+                // Destroy correctly depending on if in play mode or edit mode
+                GameObjectExtensions.DestroyGameObject(cursorInstance);
+            }
+        }
+
         #region MonoBehaviour Implementation
 
         protected override void OnEnable()
@@ -123,6 +140,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
                     renderer.enabled = false;
                 }
             }
+
+            SetCursor();
         }
 
         protected override async void Start()
@@ -140,11 +159,9 @@ namespace Microsoft.MixedReality.Toolkit.Input
             // The pointer's input source was lost during the await.
             if (Controller == null)
             {
-                Destroy(gameObject);
+                GameObjectExtensions.DestroyGameObject(gameObject);
                 return;
             }
-
-            SetCursor();
         }
 
         protected override void OnDisable()
@@ -160,6 +177,21 @@ namespace Microsoft.MixedReality.Toolkit.Input
             IsSelectPressed = false;
             HasSelectPressedOnce = false;
             BaseCursor?.SetVisibility(false);
+
+            BaseCursor c = BaseCursor as BaseCursor;
+            if (c != null)
+            {
+                c.VisibleSourcesCount--;
+            }
+
+            // Need to destroy instantiated cursor prefab if it was added by the controller itself in 'OnEnable'
+            if (isCursorInstantiatedFromPrefab)
+            {
+                // Manually reset base cursor before destroying it
+                BaseCursor.Destroy();
+                DestroyCursorInstance();
+                isCursorInstantiatedFromPrefab = false;
+            }
         }
 
         #endregion  MonoBehaviour Implementation
@@ -258,16 +290,22 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// <inheritdoc />
         public bool IsFocusLocked { get; set; }
 
-        /// <inheritdoc />
-        public bool IsTargetPositionLockedOnFocusLock { get; set; }
+        /// <summary>
+        /// Specifies whether the pointer's target position (cursor) is locked to the target object when focus is locked.
+        /// Most pointers want the cursor to "stick" to the object when manipulating, so set this to true by default.
+        /// </summary>
+        public virtual bool IsTargetPositionLockedOnFocusLock { get; set; } = true;
 
         [SerializeField]
         private bool overrideGlobalPointerExtent = false;
 
         [SerializeField]
+        [Tooltip("Maximum distance at which all pointers can collide with a GameObject, unless it has an override extent.")]
         private float pointerExtent = 10f;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Maximum distance at which all pointers can collide with a <see href="https://docs.unity3d.com/ScriptReference/GameObject.html">GameObject</see>, unless it has an override extent.
+        /// </summary>
         public float PointerExtent
         {
             get
@@ -290,6 +328,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
         }
 
         [SerializeField]
+        [Tooltip("The length of the pointer when nothing is hit")]
         private float defaultPointerExtent = 10f;
 
         /// <summary>
@@ -322,7 +361,7 @@ namespace Microsoft.MixedReality.Toolkit.Input
         public virtual SceneQueryType SceneQueryType { get; set; } = SceneQueryType.SimpleRaycast;
 
         [SerializeField]
-        [Tooltip("The radius to use when SceneQueryType is set to Sphere or SphereColliders.")]
+        [Tooltip("How far controller needs to be from object before object can be grabbed / focused.")]
         private float sphereCastRadius = 0.1f;
 
         /// <inheritdoc />
@@ -433,6 +472,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// <inheritdoc />
         public override void OnInputUp(InputEventData eventData)
         {
+            if(!IsInteractionEnabled) { return; }
+
             base.OnInputUp(eventData);
 
             if (eventData.SourceId == InputSourceParent.SourceId)
@@ -455,6 +496,8 @@ namespace Microsoft.MixedReality.Toolkit.Input
         /// <inheritdoc />
         public override void OnInputDown(InputEventData eventData)
         {
+            if (!IsInteractionEnabled) { return; }
+
             base.OnInputDown(eventData);
 
             if (eventData.SourceId == InputSourceParent.SourceId)

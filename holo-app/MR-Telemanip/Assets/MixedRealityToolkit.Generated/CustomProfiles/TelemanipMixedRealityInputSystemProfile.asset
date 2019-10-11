@@ -79,6 +79,10 @@ MonoBehaviour:
       type: 2}
   focusProviderType:
     reference: Microsoft.MixedReality.Toolkit.Input.FocusProvider, Microsoft.MixedReality.Toolkit.Services.InputSystem
+  raycastProviderType:
+    reference: Microsoft.MixedReality.Toolkit.Input.DefaultRaycastProvider, Microsoft.MixedReality.Toolkit.Services.InputSystem
+  focusQueryBufferSize: 128
+  focusIndividualCompoundCollider: 0
   inputActionsProfile: {fileID: 11400000, guid: 45145911cd6089948aadda6889c5e328,
     type: 2}
   inputActionRulesProfile: {fileID: 11400000, guid: f37b4b564f066bf4f85ae0c5a5cc9c9d,

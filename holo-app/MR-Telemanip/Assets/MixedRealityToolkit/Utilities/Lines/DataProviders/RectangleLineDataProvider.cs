@@ -76,8 +76,8 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
 
         #region MonoBehaviour Implementation
 
-        protected override void OnValidate()
-        {
+        private void OnValidate()
+        {   // This is an appropriate use of OnValidate.
             BuildPoints();
         }
 
@@ -100,8 +100,6 @@ namespace Microsoft.MixedReality.Toolkit.Utilities
         /// <summary>
         /// When we get interpolated points we subdivide the square so our sampling has more to work with
         /// </summary>
-        /// <param name="normalizedDistance"></param>
-        /// <returns></returns>
         protected override Vector3 GetPointInternal(float normalizedDistance)
         {
             BuildPoints();

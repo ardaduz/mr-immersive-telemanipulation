@@ -7,7 +7,10 @@ using UnityEngine;
 
 namespace Microsoft.MixedReality.Toolkit.SpatialAwareness
 {
-    public class BaseSpatialObserver : BaseDataProvider, IMixedRealitySpatialAwarenessObserver
+    /// <summary>
+    /// Class providing a base implementation of the <see cref="IMixedRealitySpatialAwarenessObserver"/> interface.
+    /// </summary>
+    public abstract class BaseSpatialObserver : BaseDataProvider, IMixedRealitySpatialAwarenessObserver
     {
         /// <summary>
         /// Constructor.
@@ -114,6 +117,9 @@ namespace Microsoft.MixedReality.Toolkit.SpatialAwareness
 
         /// <inheritdoc />
         public virtual void Suspend() { }
+
+        /// <inheritdoc />
+        public virtual void ClearObservations() { }
 
         #endregion IMixedRealitySpatialAwarenessObserver implementation
     }

@@ -26,27 +26,26 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos.EyeTracking
         {
             get
             {
-                if (inputSystem == null)
-                {
-                    MixedRealityServiceRegistry.TryGetService<IMixedRealityInputSystem>(out inputSystem);
-                }
+                MixedRealityServiceRegistry.TryGetService<IMixedRealityInputSystem>(out inputSystem);
                 return inputSystem;
             }
         }
 
         private void Update()
         {
-            // Update GameObject to the current eye gaze position at a given distance
-            if (InputSystem?.EyeGazeProvider?.IsEyeGazeValid == true)
+            if (InputSystem?.EyeGazeProvider != null)
             {
-                GameObject target = InputSystem.EyeGazeProvider.GazeTarget;
-                if (target != null)
+                gameObject.transform.position = InputSystem.EyeGazeProvider.GazeOrigin + InputSystem.EyeGazeProvider.GazeDirection.normalized * defaultDistanceInMeters;
+
+                EyeTrackingTarget lookedAtEyeTarget = EyeTrackingTarget.LookedAtEyeTarget;
+
+                // Update GameObject to the current eye gaze position at a given distance
+                if (lookedAtEyeTarget != null)
                 {
                     // Show the object at the center of the currently looked at target.
-                    EyeTrackingTarget etTarget = target.GetComponent<EyeTrackingTarget>();
-                    if ((etTarget != null) && (etTarget.cursor_snapToCenter))
+                    if (lookedAtEyeTarget.EyeCursorSnapToTargetCenter)
                     {
-                        Ray rayToCenter = new Ray(CameraCache.Main.transform.position, target.transform.position - CameraCache.Main.transform.position);
+                        Ray rayToCenter = new Ray(CameraCache.Main.transform.position, lookedAtEyeTarget.transform.position - CameraCache.Main.transform.position);
                         RaycastHit hitInfo;
                         UnityEngine.Physics.Raycast(rayToCenter, out hitInfo);
                         gameObject.transform.position = hitInfo.point;
@@ -54,8 +53,8 @@ namespace Microsoft.MixedReality.Toolkit.Examples.Demos.EyeTracking
                     else
                     {
                         // Show the object at the hit position of the user's eye gaze ray with the target.
-                        gameObject.transform.position = InputSystem.EyeGazeProvider.HitPosition;
-
+                        //gameObject.transform.position = EyeTrackingTarget.LookedAtPoint;
+                        gameObject.transform.position = InputSystem.EyeGazeProvider.GazeOrigin + InputSystem.EyeGazeProvider.GazeDirection.normalized * defaultDistanceInMeters;
                     }
                 }
                 else

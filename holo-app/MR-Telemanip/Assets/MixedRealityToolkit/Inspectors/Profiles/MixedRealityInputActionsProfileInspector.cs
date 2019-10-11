@@ -54,10 +54,9 @@ namespace Microsoft.MixedReality.Toolkit.Input.Editor
 
         private static void RenderList(SerializedProperty list)
         {
-            EditorGUILayout.Space();
-            GUILayout.BeginVertical();
-
-                if (MixedRealityEditorUtility.RenderIndentedButton(AddButtonContent, EditorStyles.miniButton))
+            using (new EditorGUILayout.VerticalScope())
+            {
+                if (InspectorUIUtility.RenderIndentedButton(AddButtonContent, EditorStyles.miniButton))
                 {
                     list.arraySize += 1;
                     var inputAction = list.GetArrayElementAtIndex(list.arraySize - 1);
@@ -68,44 +67,42 @@ namespace Microsoft.MixedReality.Toolkit.Input.Editor
                     inputActionDescription.stringValue = $"New Action {inputActionId.intValue = list.arraySize}";
                 }
 
-                GUILayout.Space(12f);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    var labelWidth = EditorGUIUtility.labelWidth;
+                    EditorGUIUtility.labelWidth = 36f;
+                    EditorGUILayout.LabelField(ActionContent, GUILayout.ExpandWidth(true));
+                    EditorGUILayout.LabelField(AxisConstraintContent, GUILayout.Width(96f));
+                    EditorGUILayout.LabelField(string.Empty, GUILayout.Width(24f));
+                    EditorGUIUtility.labelWidth = labelWidth;
+                }
 
-                GUILayout.BeginVertical();
-
-                GUILayout.BeginHorizontal();
-                var labelWidth = EditorGUIUtility.labelWidth;
-                EditorGUIUtility.labelWidth = 36f;
-                EditorGUILayout.LabelField(ActionContent, GUILayout.ExpandWidth(true));
-                EditorGUILayout.LabelField(AxisConstraintContent, GUILayout.Width(96f));
-                EditorGUILayout.LabelField(string.Empty, GUILayout.Width(24f));
-                EditorGUIUtility.labelWidth = labelWidth;
-                GUILayout.EndHorizontal();
-
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(100f));
 
                 for (int i = 0; i < list.arraySize; i++)
                 {
-                    EditorGUILayout.BeginHorizontal();
-                    var previousLabelWidth = EditorGUIUtility.labelWidth;
-                    EditorGUIUtility.labelWidth = 64f;
-                    SerializedProperty inputAction = list.GetArrayElementAtIndex(i);
-                    SerializedProperty inputActionDescription = inputAction.FindPropertyRelative("description");
-                    var inputActionConstraint = inputAction.FindPropertyRelative("axisConstraint");
-                    EditorGUILayout.PropertyField(inputActionDescription, GUIContent.none);
-                    EditorGUILayout.PropertyField(inputActionConstraint, GUIContent.none, GUILayout.Width(96f));
-                    EditorGUIUtility.labelWidth = previousLabelWidth;
-
-                    if (GUILayout.Button(MinusButtonContent, EditorStyles.miniButtonRight, GUILayout.Width(24f)))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        list.DeleteArrayElementAtIndex(i);
-                    }
+                        var previousLabelWidth = EditorGUIUtility.labelWidth;
+                        EditorGUIUtility.labelWidth = 64f;
+                        SerializedProperty inputAction = list.GetArrayElementAtIndex(i);
+                        SerializedProperty inputActionDescription = inputAction.FindPropertyRelative("description");
+                        var inputActionConstraint = inputAction.FindPropertyRelative("axisConstraint");
+                        EditorGUILayout.PropertyField(inputActionDescription, GUIContent.none);
+                        EditorGUILayout.PropertyField(inputActionConstraint, GUIContent.none, GUILayout.Width(96f));
+                        EditorGUIUtility.labelWidth = previousLabelWidth;
 
-                    EditorGUILayout.EndHorizontal();
+                        if (GUILayout.Button(MinusButtonContent, EditorStyles.miniButtonRight, GUILayout.Width(24f)))
+                        {
+                            list.DeleteArrayElementAtIndex(i);
+                        }
+
+                    }
                 }
 
                 EditorGUILayout.EndScrollView();
-                GUILayout.EndVertical();
-            GUILayout.EndVertical();
+            }
+            EditorGUILayout.Space();
         }
     }
 }

@@ -26,36 +26,33 @@ namespace Microsoft.MixedReality.Toolkit.Teleport
 
         #region MonoBehaviour Implementation
 
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            EnsureSetup();
-
-            if (parabolicLineData.LineTransform == transform)
-            {
-                Debug.LogWarning("Missing Parabolic line helper.\nThe Parabolic Teleport Pointer requires an empty GameObject child for calculating the parabola arc.");
-            }
-        }
-
         protected override void OnEnable()
         {
             base.OnEnable();
             EnsureSetup();
-
-            if (parabolicLineData.LineTransform == transform)
-            {
-                var pointerHelper = new GameObject("ParabolicLinePointerHelper");
-                pointerHelper.transform.SetParent(transform);
-                pointerHelper.transform.localPosition = Vector3.zero;
-                parabolicLineData.LineTransform = pointerHelper.transform;
-            }
         }
 
         private void EnsureSetup()
         {
             if (parabolicLineData == null)
             {
-                parabolicLineData = GetComponent<ParabolaPhysicalLineDataProvider>();
+                parabolicLineData = gameObject.GetComponent<ParabolaPhysicalLineDataProvider>();
+            }
+
+            if (parabolicLineData.LineTransform == transform)
+            {
+                Debug.LogWarning("Missing Parabolic line helper.\nThe Parabolic Teleport Pointer requires an empty GameObject child for calculating the parabola arc. Creating one now.");
+
+                var pointerHelper = transform.Find("ParabolicLinePointerHelper");
+
+                if (pointerHelper == null)
+                {
+                    pointerHelper = new GameObject("ParabolicLinePointerHelper").transform;
+                    pointerHelper.transform.SetParent(transform);
+                }
+
+                pointerHelper.transform.localPosition = Vector3.zero;
+                parabolicLineData.LineTransform = pointerHelper.transform;
             }
         }
 

@@ -9,13 +9,16 @@ namespace Microsoft.MixedReality.Toolkit.Diagnostics
     /// <summary>
     /// The default implementation of the <see cref="Microsoft.MixedReality.Toolkit.Diagnostics.IMixedRealityDiagnosticsSystem"/>
     /// </summary>
-    [DocLink("https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/Diagnostics/DiagnosticsSystemGettingStarted.html")]
+    [HelpURL("https://microsoft.github.io/MixedRealityToolkit-Unity/Documentation/Diagnostics/DiagnosticsSystemGettingStarted.html")]
     public class MixedRealityDiagnosticsSystem : BaseCoreSystem, IMixedRealityDiagnosticsSystem
     {
         public MixedRealityDiagnosticsSystem(
             IMixedRealityServiceRegistrar registrar,
             MixedRealityDiagnosticsProfile profile) : base(registrar, profile)
         { }
+
+        /// <inheritdoc/>
+        public override string Name { get; protected set; } = "Mixed Reality Diagnostics System";
 
         /// <summary>
         /// The parent object under which all visualization game objects will be placed.
@@ -28,6 +31,7 @@ namespace Microsoft.MixedReality.Toolkit.Diagnostics
         private void CreateVisualizations()
         {
             diagnosticVisualizationParent = new GameObject("Diagnostics");
+            diagnosticVisualizationParent.AddComponent<DiagnosticsSystemVoiceControls>();
             MixedRealityPlayspace.AddChild(diagnosticVisualizationParent.transform);
             diagnosticVisualizationParent.SetActive(ShowDiagnostics);
 
@@ -123,9 +127,11 @@ namespace Microsoft.MixedReality.Toolkit.Diagnostics
                 {
                     showDiagnostics = value;
 
-                    if (diagnosticVisualizationParent != null)
+                    // The voice commands are handled by the diagnosticVisualizationParent GameObject, we cannot disable the parent 
+                    // or we lose the ability to re-show the visualizations. Instead, disable each visualization as appropriate.
+                    if (ShowProfiler)
                     {
-                        diagnosticVisualizationParent.SetActive(value);
+                        visualProfiler.IsVisible = value;
                     }
                 }
             }
@@ -146,7 +152,7 @@ namespace Microsoft.MixedReality.Toolkit.Diagnostics
                 if (value != showProfiler)
                 {
                     showProfiler = value;
-                    if (visualProfiler != null)
+                    if ((visualProfiler != null) && ShowDiagnostics)
                     {
                         visualProfiler.IsVisible = value;
                     }
