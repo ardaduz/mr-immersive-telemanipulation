@@ -11,6 +11,10 @@ During the last decades robots have become more and more omnipresent not only in
 we can use the concepts of telemanipulation to support seamless human-machine interactions. We focus on the general purpose of using a Microsoft HoloLens 2 as an
 untethered mixed reality device to connect and interact with a state of the art collaborative robot such as YuMi from ABB Robotics.
 
+<p align="center">
+  <img src="misc/hololens-yumi.png" width="500">
+</p>
+
 We implement two main types of interaction methods and submodes in each method:
 
 #### 1. External Holographic Operation
