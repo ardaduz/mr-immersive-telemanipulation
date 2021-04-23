@@ -17,33 +17,34 @@ untethered mixed reality device to connect and interact with a state of the art 
 
 We implement two main types of interaction methods and submodes in each method:
 
-#### 1. External Holographic Operation
-   1. Default External Mode
+### 1. External Holographic Operation
+   1. **Default External Mode**
    
        User manipulates the physical robot by dragging the holographic robot arms.
        
        https://user-images.githubusercontent.com/46934354/115934229-d7efe080-a490-11eb-8c3d-89665eacfe61.mp4
        
-   2. Task Mode
+   2. **Task Mode**
    
       User constructs a task as a hologram, previews the expected movements, and executes it on the physical robot.
       
       https://user-images.githubusercontent.com/46934354/115934241-dfaf8500-a490-11eb-81c7-a5ae9c17f094.mp4
 
+<br/><br/>
 
-#### 2. Internal Immersive Operation
-   1. Default Internal Mode
+### 2. Internal Immersive Operation
+   1. **Default Internal Mode**
       
       Robot mimicks the user's movements, i.e. user's hand and head movements are executed simultaneously on the physical robot.
       
       https://user-images.githubusercontent.com/46934354/115934248-e76f2980-a490-11eb-8f18-3b568e2fa51b.mp4
 
-   2. VR Mode
+   2. **VR Mode**
 
       On top of default internal mode, user experiences the environment of the physical robot through a video stream.
 
 
-#### A Very Brief Technical Summary
+### A Very Brief Technical Summary
 
 In the Microsoft HoloLens 2 application:
 * Unity, C# and MRTKv2 are used.
