@@ -59,4 +59,4 @@ In the robot-side simulation and application:
 * States for the robot body parts and joints are sent.
 * Stereo images are acquired from Stereolabs ZED Mini camera and sent to the HoloLens.
 
-For further details please refer to the final report and/or contact the authors (also for how to run the code).
+For further details please refer to the [final report](misc/final_report.pdf) and/or contact the authors (also for how to run the code).
