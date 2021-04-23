@@ -47,7 +47,7 @@ In the Microsoft HoloLens 2 application:
 * Control messages for the YuMi hand and actuators are generated and sent through ROS#.
 * Robot state that is received from the YuMi simulation is visualized.
 
-In the robot-side application:
+In the robot-side simulation and application:
 * C++ middleware is developed. (Backend is developed at [Computational Robotics Lab](http://crl.ethz.ch/), ETH Zurich)
 * Control messages are received and interpreted.
 * Inverse kinematics is solved for the target YuMi hand positions.
