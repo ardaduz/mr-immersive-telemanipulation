@@ -2,7 +2,7 @@
 Mixed Reality Lab, ETHZ, Fall 2019, http://www.cvg.ethz.ch/teaching/mrlab/
 
 #### Authors:
-* Arda Düzçeker
+* Arda Duzceker
 * Jonas Hein
 * Qais El Okaili
 * Sandro Boccuzzo
