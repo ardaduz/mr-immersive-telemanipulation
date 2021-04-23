@@ -1,5 +1,4 @@
 # MR Immersive Telemanipulation
-Mixed Reality Lab, ETHZ, Fall 2019
 
 <p align="center">
   <img src="../misc/yumi-simulation-middleware.png" width="750">
